@@ -44,6 +44,39 @@ namespace DebugUI
             };
         }
     }
+    
+    internal sealed class DebugToggleFactory : IDebugUIElementFactory
+    {
+        public string Text { get; set; }
+        public Func<bool> Getter { get; set; }
+        public Action<bool> Setter { get; set; }
+
+        public VisualElement CreateVisualElement(ICollection<IDisposable> disposables)
+        {
+            var toggle = new Toggle(Text)
+            {
+                value = Getter()
+            };
+
+            if (Setter == null)
+            {
+                toggle.SetEnabled(false);
+            }
+            else
+            {
+                toggle.RegisterValueChangedCallback(x => Setter(x.newValue));
+            }
+            
+            MinimalRx.EveryValueChanged(this, x => x.Getter())
+                .Subscribe(x =>
+                {
+                    toggle.value = x;
+                })
+                .AddTo(disposables);
+            
+            return toggle;
+        }
+    }
 
     internal sealed class DebugSliderFactory : IDebugUIElementFactory
     {

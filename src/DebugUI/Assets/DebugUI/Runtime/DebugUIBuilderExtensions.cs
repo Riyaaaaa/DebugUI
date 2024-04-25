@@ -46,6 +46,17 @@ namespace DebugUI
             });
             return builder;
         }
+        
+        public static IDebugUIBuilder AddToggle(this IDebugUIBuilder builder, string text, Func<bool> getter, Action<bool> setter = null)
+        {
+            builder.Factories.Add(new DebugToggleFactory()
+            {
+                Text = text,
+                Getter = getter,
+                Setter = setter
+            });
+            return builder;
+        }
 
         public static IDebugUIBuilder AddField<TEnum>(this IDebugUIBuilder builder, string label, Func<TEnum> getter)
             where TEnum : Enum
